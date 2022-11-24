@@ -16,45 +16,29 @@
 
 using namespace std;
 
-class trafficSim {
 
-    vector<string> inputData;       //the data for the simulation fed through the input file, raw lines to be cleaned
-    vector<string> varNames;        //holds all the variable names for the input data
-    vector<int> varValues;          //holds all of the values for the input data
-    map<string, int> simData;       //map that holds all of the data for the simulation
+//takes in a string and removes whitespace from it and returns the cleaned string, whitespace is assumed to be at the front
+//taken from stackoverflow https://stackoverflow.com/a/16329377
+string removeWhitespace(string input) {
+    input.erase(remove(input.begin(),input.end(),' '),input.end());
+    return input;
+}
 
-    string getVarName(string line) {
-        //size_t pos{line.find_first_of(' ')};
-        string varName{line.substr(0, line.find(':'))};
-        cout << varName << endl;
-        return varName;
-    }
-public:
-    //Constructor
-    trafficSim(vector<string> input) {
+//takes in a string and returns the number contained at the end of the line. Used for the traffic sim input
+int getIntAt(string data) {
+    size_t end = data.size();
+    string str {data.substr(data.find(':') + 1, end)};
+    str = removeWhitespace(str);
+    return stoi(str);
+}
 
-        //stores input
-        inputData = input;
-
-    }
-
-    //destructor
-    ~trafficSim() {};
-
-    //stores the data from the imput into simData
-    vector<string> loadData() {
-
-        //Useful variables for setting up a while loop
-        vector<string> tokens;
-        size_t i{0};   
-
-        while(i < inputData.size()) {
-            string name = trafficSim::getVarName(inputData[i]);
-            varNames.push_back(name);
-        }
-    }
-    
-};
+//takes in a string and retuns a double at the end of the line, used for the traffic sim input
+double getDoubleAt(string data) {
+    size_t end = data.size();
+    string str {data.substr(data.find(':') + 1, end)};
+    str = removeWhitespace(str);
+    return stod(str);
+}
 
 int main(int argc, char* argv[]) {
 
@@ -64,10 +48,12 @@ int main(int argc, char* argv[]) {
         exit(0);
     }    
 
+    
+
     vector<string> inputData; //Vector containing the lines of code from the file
     string str; //used for inputting the lines into the vector
     //Collects the input file and opens it 
-    string inputFile = argv[0];
+    string inputFile = argv[1];
     ifstream myFile(inputFile);
     //Adds lines to vector
     if (myFile.is_open()) {
@@ -79,7 +65,26 @@ int main(int argc, char* argv[]) {
     }
     //Closes the input file
     myFile.close();
-
-    trafficSim test(inputData);
-    test.loadData();
+    int maximum_simulated_time {getIntAt(inputData[0])};
+    int number_of_sections_before_intersection{getIntAt(inputData[1])};
+    int green_north_south{getIntAt(inputData[2])};
+    int yellow_north_south{getIntAt(inputData[3])};
+    int green_east_west{getIntAt(inputData[4])};
+    int yellow_east_west{getIntAt(inputData[5])};
+    double prob_new_vehicle_northbound{getDoubleAt(inputData[6])};
+    double prob_new_vehicle_southbound{getDoubleAt(inputData[7])}; 
+    double prob_new_vehicle_eastbound{getDoubleAt(inputData[8])};   
+    double prob_new_vehicle_westbound{getDoubleAt(inputData[9])};   
+    double proportion_of_cars{getDoubleAt(inputData[10])};          
+    double proportion_of_SUVs{getDoubleAt(inputData[11])};
+    double proportion_of_trucks{1-proportion_of_cars-proportion_of_SUVs};
+    double proportion_right_turn_cars{getDoubleAt(inputData[12])};  
+    double proportion_left_turn_cars{getDoubleAt(inputData[13])};
+    double proportion_straight_cars{1-proportion_right_turn_cars-proportion_left_turn_cars};
+    double proportion_right_turn_SUVs{getDoubleAt(inputData[14])};  
+    double proportion_left_turn_SUVs{getDoubleAt(inputData[15])};   
+    double proportion_straight_SUVs{1-proportion_right_turn_SUVs-proportion_left_turn_SUVs};
+    double proportion_right_turn_trucks{getDoubleAt(inputData[16])};
+    double proportion_left_turn_trucks{getDoubleAt(inputData[17])};
+    double proportion_straight_trucks{1-proportion_right_turn_trucks-proportion_left_turn_trucks};
 }
