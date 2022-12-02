@@ -1,9 +1,44 @@
 #include <iostream>
 #include <random>
+#include <map>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <string>
+#include <bits/stdc++.h>
+#include <iterator>
 #include "Animator.cpp"
 #include "VehicleBase.cpp"
 
 using namespace std;
+
+//takes in a string and removes whitespace from it and returns the cleaned string, whitespace is assumed to be at the front
+//taken from stackoverflow https://stackoverflow.com/a/16329377
+string removeWhitespace(string input) {
+    input.erase(remove(input.begin(),input.end(),' '),input.end());
+    return input;
+}
+
+//takes in a string and returns the number contained at the end of the line. Used for the traffic sim input
+int getIntAt(string data) {
+    size_t end = data.size();
+    string str {data.substr(data.find(':') + 1, end)};
+    str = removeWhitespace(str);
+    return stoi(str);
+}
+
+//takes in a string and retuns a double at the end of the line, used for the traffic sim input
+double getDoubleAt(string data) {
+    size_t end = data.size();
+    string str {data.substr(data.find(':') + 1, end)};
+    str = removeWhitespace(str);
+    return stod(str);
+}
+
+string getName(string data) {
+    string str {data.substr(0,data.find(':'))};
+    return str;
+}
 
 int main(int argc, char* argv[]){
 
@@ -13,46 +48,96 @@ int main(int argc, char* argv[]){
         exit(0);
     }
 
-    int maximum_simulated_time;
-    int number_of_sections_before_intersection;
-    int green_north_south;
-    int yellow_north_south;
-    int green_east_west;
-    int yellow_east_west;
-    double prob_new_vehicle_northbound;
-    double prob_new_vehicle_southbound;
-    double prob_new_vehicle_eastbound;
-    double prob_new_vehicle_westbound;
-    double proportion_of_cars;
-    double proportion_of_SUVs;
-    double proportion_right_turn_cars;
-    double proportion_left_turn_cars;
-    double proportion_right_turn_SUVs;
-    double proportion_left_turn_SUVs;
-    double proportion_right_turn_trucks;
-    double proportion_left_turn_trucks;
+    vector<string> inputData; //Vector containing the lines of code from the file
+    string str; //used for inputting the lines into the vector
+    //Collects the input file and opens it 
+    string inputFile = argv[1];
+    ifstream myFile(inputFile);
+    //Adds lines to vector
+    if (myFile.is_open()) {
+        while(getline(myFile, str)) {
+            if(str.size() > 0) {
+                inputData.push_back(str);
+            }
+        }
+    }
+    //Closes the input file
+    myFile.close();
+
+    map<string, int> intMap;
+    map<string, double> doubleMap;
+
+    for(int i = 0; i < inputData.size(); i++) {
+        str = getName(inputData[i]);
+        if (str.compare("maximum_simulated_time") == 0 || str.compare("number_of_sections_before_intersection") == 0 ||
+            str.compare("green_north_south") == 0 || str.compare("yellow_north_south") == 0 ||
+            str.compare("green_east_west") == 0 || str.compare("yellow_east_west") == 0) {
+
+                intMap.insert(pair<string, int>(str, getIntAt(inputData.at(i))));
+        }
+        else {
+            doubleMap.insert(pair<string, double>(str, getDoubleAt(inputData.at(i))));
+        }
+    }
+
+    // int maximum_simulated_time;
+    // int number_of_sections_before_intersection;
+    // int green_north_south;
+    // int yellow_north_south;
+    // int green_east_west;
+    // int yellow_east_west;
+    // double prob_new_vehicle_northbound;
+    // double prob_new_vehicle_southbound;
+    // double prob_new_vehicle_eastbound;
+    // double prob_new_vehicle_westbound;
+    // double proportion_of_cars;
+    // double proportion_of_SUVs;
+    // double proportion_right_turn_cars;
+    // double proportion_left_turn_cars;
+    // double proportion_right_turn_SUVs;
+    // double proportion_left_turn_SUVs;
+    // double proportion_right_turn_trucks;
+    // double proportion_left_turn_trucks;
+
+    // maximum_simulated_time = 1000;
+    // number_of_sections_before_intersection = 10;
+    // green_north_south = 12;
+    // yellow_north_south = 3;
+    // green_east_west = 10;
+    // yellow_east_west = 3;
+    // prob_new_vehicle_northbound = .25;
+    // prob_new_vehicle_southbound = .1;
+    // prob_new_vehicle_eastbound = .15;
+    // prob_new_vehicle_westbound = .15;
+    // proportion_of_cars = .6;
+    // proportion_of_SUVs = .3;
+    // proportion_right_turn_cars = .4;
+    // proportion_left_turn_cars = .1;
+    // proportion_right_turn_SUVs = .3;
+    // proportion_left_turn_SUVs = .05;
+    // proportion_right_turn_trucks = .2;
+    // proportion_left_turn_trucks = .02;
+    int maximum_simulated_time {intMap.at("maximum_simulated_time")};
+    int number_of_sections_before_intersection{intMap.at("number_of_sections_before_intersection")};
+    int green_north_south{intMap.at("green_north_south")};
+    int yellow_north_south{intMap.at("yellow_north_south")};
+    int green_east_west{intMap.at("green_east_west")};
+    int yellow_east_west{intMap.at("yellow_east_west")};
+
+    double prob_new_vehicle_northbound{doubleMap.at("prob_new_vehicle_northbound")};
+    double prob_new_vehicle_southbound{doubleMap.at("prob_new_vehicle_southbound")}; 
+    double prob_new_vehicle_eastbound{doubleMap.at("prob_new_vehicle_eastbound")};   
+    double prob_new_vehicle_westbound{doubleMap.at("prob_new_vehicle_westbound")};
+    double proportion_of_cars{doubleMap.at("proportion_of_cars")};          
+    double proportion_of_SUVs{doubleMap.at("proportion_of_SUVs")};
+    double proportion_right_turn_cars{doubleMap.at("proportion_right_turn_cars")};  
+    double proportion_left_turn_cars{doubleMap.at("proportion_left_turn_cars")};
+    double proportion_right_turn_SUVs{doubleMap.at("proportion_right_turn_SUVs")};  
+    double proportion_left_turn_SUVs{doubleMap.at("proportion_left_turn_SUVs")}; 
+    double proportion_right_turn_trucks{doubleMap.at("proportion_right_turn_trucks")};
+    double proportion_left_turn_trucks{doubleMap.at("proportion_left_turn_trucks")};
 
     int initialSeed;
-
-    maximum_simulated_time = 1000;
-    number_of_sections_before_intersection = 10;
-    green_north_south = 12;
-    yellow_north_south = 3;
-    green_east_west = 10;
-    yellow_east_west = 3;
-    prob_new_vehicle_northbound = .25;
-    prob_new_vehicle_southbound = .1;
-    prob_new_vehicle_eastbound = .15;
-    prob_new_vehicle_westbound = .15;
-    proportion_of_cars = .6;
-    proportion_of_SUVs = .3;
-    proportion_right_turn_cars = .4;
-    proportion_left_turn_cars = .1;
-    proportion_right_turn_SUVs = .3;
-    proportion_left_turn_SUVs = .05;
-    proportion_right_turn_trucks = .2;
-    proportion_left_turn_trucks = .02;
-
     initialSeed = {stoi(argv[2])};
 
     Animator::MAX_VEHICLE_COUNT = 999;
