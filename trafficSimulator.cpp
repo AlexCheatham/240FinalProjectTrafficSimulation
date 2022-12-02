@@ -40,6 +40,11 @@ double getDoubleAt(string data) {
     return stod(str);
 }
 
+string getName(string data) {
+    string str {data.substr(0,data.find(':'))};
+    return str;
+}
+
 //call this if square is empty, direction char will have N, S, E, W, and will return spawn details if vehicle is to be spawned
 vector<string> spawnOutcome(char direction, mt19937& randomNumberGenerator, vector<double> vehicleProb, 
                             vector<double> vehicleProportion, vector<double> carTurns, vector<double> SUVTurns, 
@@ -299,49 +304,72 @@ int main(int argc, char* argv[]) {
     }
     //Closes the input file
     myFile.close();
-    int maximum_simulated_time {getIntAt(inputData[0])};
-    int number_of_sections_before_intersection{getIntAt(inputData[1])};
-    int green_north_south{getIntAt(inputData[2])};
-    int yellow_north_south{getIntAt(inputData[3])};
-    int green_east_west{getIntAt(inputData[4])};
-    int yellow_east_west{getIntAt(inputData[5])};
 
-    double prob_new_vehicle_northbound{getDoubleAt(inputData[6])};
-    double prob_new_vehicle_southbound{getDoubleAt(inputData[7])}; 
-    double prob_new_vehicle_eastbound{getDoubleAt(inputData[8])};   
-    double prob_new_vehicle_westbound{getDoubleAt(inputData[9])};
+    map<string, int> intMap;
+    map<string, double> doubleMap;
+
+    for(int i = 0; i < inputData.size(); i++) {
+        str = getName(inputData[i]);
+        if (str.compare("maximum_simulated_time") == 0 || str.compare("number_of_sections_before_intersection") == 0 ||
+            str.compare("green_north_south") == 0 || str.compare("yellow_north_south") == 0 ||
+            str.compare("green_east_west") == 0 || str.compare("yellow_east_west") == 0) {
+
+                intMap.insert(pair<string, int>(str, getIntAt(inputData.at(i))));
+        }
+        else {
+            doubleMap.insert(pair<string, double>(str, getDoubleAt(inputData.at(i))));
+        }
+    }
+    for(auto& i: intMap) {
+        cout << i.first << ": " << i.second << endl;
+    }
+    for(auto& i: doubleMap) {
+        cout << i.first << ": " << i.second << endl;
+    }
+    
+    int maximum_simulated_time {intMap.at("maximum_simulated_time")};
+    int number_of_sections_before_intersection{intMap.at("number_of_sections_before_intersection")};
+    int green_north_south{intMap.at("green_north_south")};
+    int yellow_north_south{intMap.at("yellow_north_south")};
+    int green_east_west{intMap.at("green_east_west")};
+    int yellow_east_west{intMap.at("yellow_east_west")};
+
+    double prob_new_vehicle_northbound{doubleMap.at("prob_new_vehicle_northbound")};
+    double prob_new_vehicle_southbound{doubleMap.at("prob_new_vehicle_southbound")}; 
+    double prob_new_vehicle_eastbound{doubleMap.at("prob_new_vehicle_eastbound")};   
+    double prob_new_vehicle_westbound{doubleMap.at("prob_new_vehicle_westbound")};
     vector<double> prob_new_vehicle;
     prob_new_vehicle.push_back(prob_new_vehicle_northbound);
     prob_new_vehicle.push_back(prob_new_vehicle_southbound);
     prob_new_vehicle.push_back(prob_new_vehicle_eastbound);
     prob_new_vehicle.push_back(prob_new_vehicle_westbound);
 
-    double proportion_of_cars{getDoubleAt(inputData[10])};          
-    double proportion_of_SUVs{getDoubleAt(inputData[11])};
+    double proportion_of_cars{doubleMap.at("proportion_of_cars")};          
+    double proportion_of_SUVs{doubleMap.at("proportion_of_SUVs")};
     double proportion_of_trucks{1-proportion_of_cars-proportion_of_SUVs};
     vector<double> new_vehicle_proportion;
     new_vehicle_proportion.push_back(proportion_of_cars);
     new_vehicle_proportion.push_back(proportion_of_SUVs);
     new_vehicle_proportion.push_back(proportion_of_trucks);
 
-    double proportion_right_turn_cars{getDoubleAt(inputData[12])};  
-    double proportion_left_turn_cars{getDoubleAt(inputData[13])};
+    double proportion_right_turn_cars{doubleMap.at("proportion_right_turn_cars")};  
+    double proportion_left_turn_cars{doubleMap.at("proportion_left_turn_cars")};
     double proportion_straight_cars{1-proportion_right_turn_cars-proportion_left_turn_cars};
     vector<double> car_turns;
     car_turns.push_back(proportion_right_turn_cars);
     car_turns.push_back(proportion_left_turn_cars);
     car_turns.push_back(proportion_straight_cars);
 
-    double proportion_right_turn_SUVs{getDoubleAt(inputData[14])};  
-    double proportion_left_turn_SUVs{getDoubleAt(inputData[15])};   
+    double proportion_right_turn_SUVs{doubleMap.at("proportion_right_turn_SUVs")};  
+    double proportion_left_turn_SUVs{doubleMap.at("proportion_left_turn_SUVs")};   
     double proportion_straight_SUVs{1-proportion_right_turn_SUVs-proportion_left_turn_SUVs};
     vector<double> SUV_turns;
     SUV_turns.push_back(proportion_right_turn_SUVs);
     SUV_turns.push_back(proportion_left_turn_SUVs);
     SUV_turns.push_back(proportion_straight_SUVs);
 
-    double proportion_right_turn_trucks{getDoubleAt(inputData[16])};
-    double proportion_left_turn_trucks{getDoubleAt(inputData[17])};
+    double proportion_right_turn_trucks{doubleMap.at("proportion_right_turn_trucks")};
+    double proportion_left_turn_trucks{doubleMap.at("proportion_left_turn_trucks")};
     double proportion_straight_trucks{1-proportion_right_turn_trucks-proportion_left_turn_trucks};
     vector<double> truck_turns;
     truck_turns.push_back(proportion_right_turn_trucks);
