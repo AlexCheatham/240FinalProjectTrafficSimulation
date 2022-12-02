@@ -7,8 +7,8 @@
 #include <string>
 #include <bits/stdc++.h>
 #include <iterator>
-#include "Animator.cpp"
-#include "VehicleBase.cpp"
+#include "Animator.h"
+#include "VehicleBase.h"
 
 using namespace std;
 
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]){
 
     //Makes sure correct amount of command line arguments
     if (argc < 2) {
-        cerr << "Usage: " << argv[0] << " [input file]" << "[initial seed]" << endl;
+        cerr << "Usage: " << argv[0] << " [input file]" << " [initial seed]" << endl;
         exit(0);
     }
 

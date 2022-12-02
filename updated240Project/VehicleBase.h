@@ -5,6 +5,8 @@
 enum class Direction   {north, south, east, west};
 enum class VehicleType {car, suv, truck};
 enum class LightColor  {green, yellow, red};
+Direction NULLDIRECTION;
+VehicleType NULLVEHICLETYPE;
 
 class VehicleBase
 {
@@ -17,9 +19,12 @@ class VehicleBase
       Direction   vehicleDirection;
 
    public:
-      VehicleBase(VehicleType type, Direction originalDirection);
-      VehicleBase(const VehicleBase& other);
-      ~VehicleBase();
+      VehicleBase(VehicleType type, Direction originalDirection);    //constructor
+      VehicleBase(const VehicleBase& other);                         //copy constructor
+      VehicleBase& operator=(const VehicleBase& other);              //copy assignment operator
+      VehicleBase(VehicleBase&& other)noexcept;                      //move constructor
+      VehicleBase& operator=(VehicleBase&& other)noexcept;           //move assignment operator
+      ~VehicleBase();                                                //destructor
 
       inline int getVehicleID() const { return this->vehicleID; }
 
